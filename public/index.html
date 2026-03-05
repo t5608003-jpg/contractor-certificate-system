@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>承攬商進廠查詢系統</title>
+
+<style>
+
+body{
+font-family: Arial;
+margin:40px;
+}
+
+table{
+border-collapse: collapse;
+width:100%;
+}
+
+th,td{
+border:1px solid #ccc;
+padding:8px;
+}
+
+</style>
+
+</head>
+<body>
+
+<h2>承攬商證照查詢</h2>
+
+<input id="keyword" placeholder="姓名 / 證照 / 證號">
+<button onclick="search()">查詢</button>
+
+<br><br>
+
+<input type="file" id="file">
+<button onclick="upload()">上傳資料</button>
+
+<p id="status"></p>
+
+<table>
+
+<thead>
+<tr>
+<th>姓名</th>
+<th>證照名稱</th>
+<th>合格證字號</th>
+<th>到期日</th>
+<th>預定課程日期及地點</th>
+</tr>
+</thead>
+
+<tbody id="result"></tbody>
+
+</table>
+
+<script src="app.js"></script>
+
+</body>
+</html>
