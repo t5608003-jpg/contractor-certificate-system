@@ -1,61 +1,28 @@
 async function search(){
 
-const keyword = document.getElementById("keyword").value
+    const keyword = document.getElementById("keyword").value
+    const expiry = document.getElementById("expiry").value
 
-const res = await fetch(`/api/search?keyword=${keyword}`)
+    const res = await fetch(`/search?keyword=${keyword}&expiry=${expiry}`)
 
-const data = await res.json()
+    const data = await res.json()
 
-const tbody = document.getElementById("result")
+    const tbody = document.getElementById("result")
 
-tbody.innerHTML=""
+    tbody.innerHTML = ""
 
-data.forEach(r=>{
+    data.forEach(r => {
 
-const tr=document.createElement("tr")
+        tbody.innerHTML += `
+        <tr>
+        <td>${r.unit}</td>
+        <td>${r.name}</td>
+        <td>${r.certificate}</td>
+        <td>${r.number}</td>
+        <td>${r.expiry}</td>
+        </tr>
+        `
 
-tr.innerHTML=`
-<td>${r.name}</td>
-<td>${r.certificate}</td>
-<td>${r.number}</td>
-<td>${r.expire}</td>
-<td>${r.course}</td>
-`
-
-tbody.appendChild(tr)
-
-})
-
-}
-
-async function upload(){
-
-const file=document.getElementById("file").files[0]
-
-const form=new FormData()
-
-form.append("file",file)
-
-await fetch("/upload",{
-method:"POST",
-body:form
-})
-
-alert("上傳完成")
-
-loadStatus()
+    })
 
 }
-
-async function loadStatus(){
-
-const res=await fetch("/api/status")
-
-const data=await res.json()
-
-document.getElementById("status").innerText=
-`目前資料筆數：${data.count}`
-
-}
-
-loadStatus()
