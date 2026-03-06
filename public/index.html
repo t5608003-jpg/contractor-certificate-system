@@ -1,27 +1,24 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <title>承攬商證照查詢系統</title>
 </head>
 
 <body>
 
-<h2>承攬商證照查詢系統</h2>
+<h2>證照資料上傳</h2>
 
-<h3>上傳證照資料 (CSV / Excel)</h3>
-
-<input type="file" id="fileInput">
+<input type="file" id="file">
 <button onclick="upload()">上傳</button>
 
-<p id="status"></p>
+<p id="msg"></p>
 
 <hr>
 
-<h3>資料查詢</h3>
+<h2>資料查詢</h2>
 
-<input id="keyword" placeholder="輸入 單位 / 姓名 / 證照關鍵字">
+<input id="keyword" placeholder="輸入 廠別 / 單位 / 姓名 / 證照">
 
 <select id="expiry">
 <option value="">全部</option>
@@ -39,13 +36,19 @@
 <table border="1">
 
 <thead>
+
 <tr>
-<th>單位</th>
+
+<th>廠別</th>
+<th>單位/部門</th>
 <th>姓名</th>
-<th>證照名稱</th>
+<th>證照</th>
 <th>證號</th>
 <th>到期日</th>
+<th>課程安排</th>
+
 </tr>
+
 </thead>
 
 <tbody id="result"></tbody>
