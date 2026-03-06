@@ -1,75 +1,23 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html>
+
 <head>
 <meta charset="UTF-8">
-<title>承攬商進廠查詢系統</title>
-
-<style>
-
-body{
-font-family: Arial;
-margin:40px;
-}
-
-h1{
-margin-bottom:20px;
-}
-
-input,select,button{
-padding:8px;
-margin:5px;
-}
-
-table{
-border-collapse: collapse;
-margin-top:20px;
-width:100%;
-}
-
-th,td{
-padding:8px;
-text-align:left;
-border:1px solid #ccc;
-}
-
-th{
-background:#f0f0f0;
-}
-
-#count{
-margin-top:10px;
-font-weight:bold;
-}
-
-</style>
-
+<title>承攬商證照查詢系統</title>
 </head>
-
 
 <body>
 
-<h1>承攬商進廠查詢系統</h1>
-
-
-<!-- 檔案上傳 -->
+<h2>承攬商證照查詢系統</h2>
 
 <h3>上傳證照資料 (CSV / Excel)</h3>
 
-<input type="file" id="file">
-
+<input type="file" id="fileInput">
 <button onclick="upload()">上傳</button>
 
-<div id="uploadMsg"></div>
-
-<div id="count"></div>
-
-
+<p id="status"></p>
 
 <hr>
-
-
-
-<!-- 查詢 -->
 
 <h3>資料查詢</h3>
 
@@ -86,11 +34,9 @@ font-weight:bold;
 
 <button onclick="search()">查詢</button>
 
+<br><br>
 
-
-<!-- 查詢結果 -->
-
-<table>
+<table border="1">
 
 <thead>
 <tr>
@@ -106,10 +52,7 @@ font-weight:bold;
 
 </table>
 
-
-
-<script src="/app.js"></script>
+<script src="app.js"></script>
 
 </body>
-
 </html>
