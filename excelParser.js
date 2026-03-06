@@ -1,23 +1,15 @@
-const XLSX = require("xlsx")
+import xlsx from "xlsx"
+import fs from "fs"
 
-function parseExcel(buffer){
+export async function parseExcel(path) {
 
-    const workbook = XLSX.read(buffer,{type:"buffer"})
+  const workbook = xlsx.readFile(path)
 
-    const sheet = workbook.Sheets[workbook.SheetNames[0]]
+  const sheet = workbook.Sheets[workbook.SheetNames[0]]
 
-    const rows = XLSX.utils.sheet_to_json(sheet)
+  const data = xlsx.utils.sheet_to_json(sheet)
 
-    return rows.map(r=>({
+  fs.unlinkSync(path)
 
-        unit: r["單位"] || r["廠別"] || "",
-        name: r["姓名"] || "",
-        cert: r["證照名稱"] || r["證照"] || "",
-        certNo: r["證號"] || r["證照號碼"] || "",
-        expiry: r["到期日"] || r["有效期限"] || ""
-
-    }))
-
+  return data
 }
-
-module.exports = parseExcel
