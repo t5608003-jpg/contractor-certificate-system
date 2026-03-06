@@ -1,27 +1,44 @@
-import express from "express"
-import multer from "multer"
-import cors from "cors"
-import { parseExcel } from "./excelParser.js"
+const express = require("express")
+const multer = require("multer")
+const XLSX = require("xlsx")
+const cors = require("cors")
 
 const app = express()
-const upload = multer({ dest: "uploads/" })
-
 app.use(cors())
 app.use(express.json())
-
-// 讀取 public 資料夾
 app.use(express.static("public"))
+
+const upload = multer({ storage: multer.memoryStorage() })
 
 let database = []
 
-// 上傳 Excel / CSV
-app.post("/upload", upload.single("file"), async (req, res) => {
+/* =========================
+   Excel / CSV 上傳
+========================= */
+
+app.post("/upload", upload.single("file"), (req, res) => {
+
+    if (!req.file) {
+        return res.json({ count: 0 })
+    }
 
     try {
 
-        const rows = await parseExcel(req.file.path)
+        const workbook = XLSX.read(req.file.buffer, { type: "buffer" })
 
-        database = rows
+        const sheet = workbook.Sheets[workbook.SheetNames[0]]
+
+        const rows = XLSX.utils.sheet_to_json(sheet)
+
+        database = rows.map(r => ({
+
+            unit: r["單位"] || r["廠別"] || "",
+            name: r["姓名"] || "",
+            cert: r["證照名稱"] || r["證照"] || "",
+            certNo: r["證號"] || r["證照號碼"] || "",
+            expiry: formatDate(r["到期日"] || r["有效期限"] || "")
+
+        }))
 
         res.json({
             success: true,
@@ -32,68 +49,54 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
         console.error(err)
 
-        res.status(500).json({
-            success: false
+        res.json({
+            success: false,
+            error: "Excel解析失敗"
         })
+
     }
 
 })
 
 
-// 取得現在年月
-function getMonthDiff(date1, date2){
+/* =========================
+   查詢 API
+========================= */
 
-    const y1 = date1.getFullYear()
-    const m1 = date1.getMonth()
-
-    const y2 = date2.getFullYear()
-    const m2 = date2.getMonth()
-
-    return (y2 - y1) * 12 + (m2 - m1)
-
-}
-
-
-// 查詢 API
 app.get("/search", (req, res) => {
 
-    const keyword = req.query.keyword || ""
+    const keyword = (req.query.keyword || "").toLowerCase()
     const expiry = req.query.expiry || ""
 
-    let result = database
+    let result = database.filter(r =>
 
-    // 關鍵字查詢
-    if(keyword){
+        r.unit.toLowerCase().includes(keyword) ||
+        r.name.toLowerCase().includes(keyword) ||
+        r.cert.toLowerCase().includes(keyword)
 
-        result = result.filter(r =>
+    )
 
-            (r.unit || "").includes(keyword) ||
-            (r.name || "").includes(keyword) ||
-            (r.certificate || "").includes(keyword) ||
-            (r.number || "").includes(keyword)
-
-        )
-
-    }
-
-    // 到期篩選
-    if(expiry){
+    if (expiry) {
 
         const now = new Date()
 
         result = result.filter(r => {
 
-            if(!r.expiryDate) return false
+            if (!r.expiry) return false
 
-            const diff = getMonthDiff(now, r.expiryDate)
+            const d = new Date(r.expiry)
 
-            if(expiry === "expired") return diff < 0
-            if(expiry === "0") return diff === 0
-            if(expiry === "1") return diff === 1
-            if(expiry === "2") return diff === 2
-            if(expiry === "3") return diff === 3
+            if (expiry === "expired") return d < now
 
-            return true
+            if (expiry === "month")
+                return d.getMonth() === now.getMonth() &&
+                       d.getFullYear() === now.getFullYear()
+
+            const future = new Date()
+            future.setMonth(future.getMonth() + Number(expiry))
+
+            return d <= future
+
         })
 
     }
@@ -103,25 +106,33 @@ app.get("/search", (req, res) => {
 })
 
 
-// 取得資料筆數
-app.get("/count", (req,res)=>{
+/* =========================
+   日期格式轉換
+========================= */
 
-    res.json({
-        count: database.length
-    })
+function formatDate(v){
+
+    if(!v) return ""
+
+    if(typeof v === "number"){
+
+        const date = XLSX.SSF.parse_date_code(v)
+
+        return `${date.y}-${date.m}-${date.d}`
+    }
+
+    return v
+}
+
+
+/* =========================
+   Server
+========================= */
+
+const PORT = process.env.PORT || 3000
+
+app.listen(PORT, () => {
+
+    console.log("Server running on", PORT)
 
 })
-
-
-// health check
-app.get("/", (req,res)=>{
-    res.send("Certificate System Running")
-})
-
-// server start
-const PORT = process.env.PORT || 8080
-
-app.listen(PORT, "0.0.0.0", () => {
-    console.log("Server running on port " + PORT)
-})
-
