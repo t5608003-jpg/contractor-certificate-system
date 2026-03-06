@@ -51,18 +51,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
     const rows = await parseExcel(req.file.path)
 
-    database = rows.map(r => ({
-
-      plant: r["廠別"] || "",
-      dept: r["單位"] || r["部門"] || "",
-      name: r["姓名"] || "",
-      cert: r["證照名稱"] || "",
-      certNo: r["合格證字號"] || "",
-      expiry: r["到期日"] || "",
-      courseDate: "",
-      coursePlace: ""
-
-    }))
+    database = rows
 
     res.json({
       success: true,
@@ -149,3 +138,4 @@ const PORT = process.env.PORT || 8080
 app.listen(PORT, () => {
   console.log("Server running on port", PORT)
 })
+
